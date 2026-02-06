@@ -1,0 +1,37 @@
+name: CI Database Validation
+
+on: [push]
+
+jobs:
+  test-database:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres_db:
+        image: postgres:15
+        env:
+          POSTGRES_DB: dev
+          POSTGRES_USER: usedev
+          POSTGRES_PASSWORD: 1234
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v4
+
+      - name: Installer le client Postgres
+        run: sudo apt-get install -y postgresql-client
+
+      - name: Executer le script SQL et vérifier
+        env:
+          PGPASSWORD: '1234'
+        run: |
+          psql -h localhost -U usedev -d dev -f init.sql
+          echo "--- VERIFICATION DES DONNEES ---"
+          psql -h localhost -U usedev -d dev -c "SELECT * FROM users;"
