@@ -6,3 +6,4 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 INSERT INTO users (username, email) VALUES ('ilunga', 'ilunga@devops.com');
+-- Test final
