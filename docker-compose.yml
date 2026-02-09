@@ -1,21 +1,29 @@
+version: '3.8'
+
 services:
-  # On définit notre service de base de données
   db-dev:
-    image: postgres:15
     container_name: postgres_local
-    restart: always
+    image: postgres:15
     environment:
-      # Ces variables créent automatiquement la DB et l'utilisateur au démarrage
       POSTGRES_DB: dev
       POSTGRES_USER: usedev
       POSTGRES_PASSWORD: 1234
     ports:
-      - "5433:5432"
+      - "5433:5432"  # On garde le 5433 pour éviter le conflit
     volumes:
-      # Optionnel : pour que tes données ne disparaissent pas quand tu coupes Docker
       - db_data:/var/lib/postgresql/data
-      # Magique : tout fichier .sql dans ce dossier est exécuté au premier lancement
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  pgadmin:
+    container_name: pgadmin_local
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "8080:80"  # ICI on charge le port 8080 !
+    depends_on:
+      - db-dev
 
 volumes:
   db_data:
